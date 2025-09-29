@@ -1,5 +1,5 @@
 
-        // MenuViews.java
+// MenuViews.java
 package com.example.pulseblocks;
 
 import android.content.Context;
@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
 import java.util.List;
 
 // Vista del menú principal
@@ -46,8 +47,8 @@ class MenuView extends LinearLayout {
         title.setTag("title"); // Tag para animaciones
 
         LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
         );
         titleParams.setMargins(0, 0, 0, 100);
         addView(title, titleParams);
@@ -67,11 +68,26 @@ class MenuView extends LinearLayout {
         subtitle.setTag("subtitle"); // Tag para animaciones
 
         LinearLayout.LayoutParams subtitleParams = new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
         );
         subtitleParams.setMargins(0, 50, 0, 0);
         addView(subtitle, subtitleParams);
+    }
+
+    private void createMenuButton(String text, Runnable action) {
+        Button button = new Button(getContext());
+        button.setText(text);
+        button.setTextSize(20);
+        button.setBackgroundColor(Color.DKGRAY);
+        button.setTextColor(Color.WHITE);
+        button.setOnClickListener(v -> action.run());
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                400, 80
+        );
+        params.setMargins(0, 10, 0, 10);
+        addView(button, params);
     }
 
     private void createAnimatedMenuButton(String text, Runnable action, int index) {
@@ -101,7 +117,7 @@ class MenuView extends LinearLayout {
         });
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-            400, 80
+                400, 80
         );
         params.setMargins(0, 10, 0, 10);
         addView(button, params);
@@ -112,9 +128,9 @@ class MenuView extends LinearLayout {
         View title = findViewWithTag("title");
         if (title != null) {
             ScaleAnimation pulseAnimation = new ScaleAnimation(
-                1.0f, 1.1f, 1.0f, 1.1f,
-                Animation.RELATIVE_TO_SELF, 0.5f,
-                Animation.RELATIVE_TO_SELF, 0.5f
+                    1.0f, 1.1f, 1.0f, 1.1f,
+                    Animation.RELATIVE_TO_SELF, 0.5f,
+                    Animation.RELATIVE_TO_SELF, 0.5f
             );
             pulseAnimation.setDuration(2000);
             pulseAnimation.setRepeatMode(Animation.REVERSE);
@@ -127,7 +143,7 @@ class MenuView extends LinearLayout {
             View button = findViewWithTag("button_" + i);
             if (button != null) {
                 TranslateAnimation slideIn = new TranslateAnimation(
-                    -300, 0, 0, 0
+                        -300, 0, 0, 0
                 );
                 slideIn.setDuration(500);
                 slideIn.setStartOffset(i * 150); // Escalonar las animaciones
@@ -156,10 +172,10 @@ class MenuView extends LinearLayout {
 
     private void animateButtonPress(Button button, boolean pressed) {
         ScaleAnimation scaleAnim = new ScaleAnimation(
-            pressed ? 1.0f : 0.95f, pressed ? 0.95f : 1.0f,
-            pressed ? 1.0f : 0.95f, pressed ? 0.95f : 1.0f,
-            Animation.RELATIVE_TO_SELF, 0.5f,
-            Animation.RELATIVE_TO_SELF, 0.5f
+                pressed ? 1.0f : 0.95f, pressed ? 0.95f : 1.0f,
+                pressed ? 1.0f : 0.95f, pressed ? 0.95f : 1.0f,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f
         );
         scaleAnim.setDuration(100);
         scaleAnim.setFillAfter(true);
@@ -172,9 +188,9 @@ class MenuView extends LinearLayout {
     private void animateButtonClick(Button button, Runnable action) {
         // Animación de click con efecto de ondas
         ScaleAnimation clickAnim = new ScaleAnimation(
-            1.0f, 1.2f, 1.0f, 1.2f,
-            Animation.RELATIVE_TO_SELF, 0.5f,
-            Animation.RELATIVE_TO_SELF, 0.5f
+                1.0f, 1.2f, 1.0f, 1.2f,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f
         );
         clickAnim.setDuration(150);
         clickAnim.setRepeatMode(Animation.REVERSE);
@@ -182,7 +198,8 @@ class MenuView extends LinearLayout {
 
         clickAnim.setAnimationListener(new Animation.AnimationListener() {
             @Override
-            public void onAnimationStart(Animation animation) {}
+            public void onAnimationStart(Animation animation) {
+            }
 
             @Override
             public void onAnimationEnd(Animation animation) {
@@ -190,11 +207,10 @@ class MenuView extends LinearLayout {
             }
 
             @Override
-            public void onAnimationRepeat(Animation animation) {}
+            public void onAnimationRepeat(Animation animation) {
+            }
         });
 
         button.startAnimation(clickAnim);
     }
 }
-
-

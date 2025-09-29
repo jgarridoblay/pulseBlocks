@@ -1,3 +1,3 @@
-/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/.cxx/Debug/1u1443t2/x86/CMakeFiles/pulseblocks.dir
-/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/.cxx/Debug/1u1443t2/x86/CMakeFiles/edit_cache.dir
-/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/.cxx/Debug/1u1443t2/x86/CMakeFiles/rebuild_cache.dir
+/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/x86/CMakeFiles/pulseblocks.dir
+/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/x86/CMakeFiles/edit_cache.dir
+/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/x86/CMakeFiles/rebuild_cache.dir

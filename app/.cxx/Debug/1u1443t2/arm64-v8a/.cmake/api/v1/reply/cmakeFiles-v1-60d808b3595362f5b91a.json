@@ -37,7 +37,7 @@
 		},
 		{
 			"isGenerated" : true,
-			"path" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/.cxx/Debug/1u1443t2/x86/CMakeFiles/3.22.1-g37088a8/CMakeSystem.cmake"
+			"path" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/arm64-v8a/CMakeFiles/3.22.1-g37088a8/CMakeSystem.cmake"
 		},
 		{
 			"isExternal" : true,
@@ -303,7 +303,7 @@
 		},
 		{
 			"isGenerated" : true,
-			"path" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/.cxx/Debug/1u1443t2/x86/CMakeFiles/3.22.1-g37088a8/CMakeCCompiler.cmake"
+			"path" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/arm64-v8a/CMakeFiles/3.22.1-g37088a8/CMakeCCompiler.cmake"
 		},
 		{
 			"isCMake" : true,
@@ -537,7 +537,7 @@
 		},
 		{
 			"isGenerated" : true,
-			"path" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/.cxx/Debug/1u1443t2/x86/CMakeFiles/3.22.1-g37088a8/CMakeCXXCompiler.cmake"
+			"path" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/arm64-v8a/CMakeFiles/3.22.1-g37088a8/CMakeCXXCompiler.cmake"
 		},
 		{
 			"isCMake" : true,
@@ -688,7 +688,7 @@
 		},
 		{
 			"isGenerated" : true,
-			"path" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/.cxx/Debug/1u1443t2/x86/CMakeFiles/3.22.1-g37088a8/CMakeCCompiler.cmake"
+			"path" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/arm64-v8a/CMakeFiles/3.22.1-g37088a8/CMakeCCompiler.cmake"
 		},
 		{
 			"isCMake" : true,
@@ -782,18 +782,18 @@
 		},
 		{
 			"isGenerated" : true,
-			"path" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/.cxx/Debug/1u1443t2/x86/CMakeFiles/3.22.1-g37088a8/CMakeCXXCompiler.cmake"
+			"path" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/arm64-v8a/CMakeFiles/3.22.1-g37088a8/CMakeCXXCompiler.cmake"
 		},
 		{
 			"isExternal" : true,
-			"path" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/.cxx/Debug/1u1443t2/prefab/x86/prefab/lib/i686-linux-android/cmake/game-activity/game-activityConfig.cmake"
+			"path" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/prefab/arm64-v8a/prefab/lib/aarch64-linux-android/cmake/game-activity/game-activityConfig.cmake"
 		}
 	],
 	"kind" : "cmakeFiles",
 	"paths" : 
 	{
-		"build" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/.cxx/Debug/1u1443t2/x86",
-		"source" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/src/main/cpp"
+		"build" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/arm64-v8a",
+		"source" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/src/main/cpp"
 	},
 	"version" : 
 	{

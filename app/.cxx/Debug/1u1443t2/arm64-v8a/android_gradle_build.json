@@ -1,19 +1,19 @@
 {
   "buildFiles": [
-    "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/src/main/cpp/CMakeLists.txt"
+    "/Users/juangarrido/Documents/juegos/pulseBlocks/app/src/main/cpp/CMakeLists.txt"
   ],
   "cleanCommandsComponents": [
     [
       "/Users/juangarrido/Library/Android/sdk/cmake/3.22.1/bin/ninja",
       "-C",
-      "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/.cxx/Debug/1u1443t2/arm64-v8a",
+      "/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/arm64-v8a",
       "clean"
     ]
   ],
   "buildTargetsCommandComponents": [
     "/Users/juangarrido/Library/Android/sdk/cmake/3.22.1/bin/ninja",
     "-C",
-    "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/.cxx/Debug/1u1443t2/arm64-v8a",
+    "/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/arm64-v8a",
     "{LIST_OF_TARGETS_TO_BUILD}"
   ],
   "libraries": {
@@ -21,7 +21,7 @@
       "toolchain": "toolchain",
       "abi": "arm64-v8a",
       "artifactName": "pulseblocks",
-      "output": "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/build/intermediates/cxx/Debug/1u1443t2/obj/arm64-v8a/libpulseblocks.so",
+      "output": "/Users/juangarrido/Documents/juegos/pulseBlocks/app/build/intermediates/cxx/Debug/1u1443t2/obj/arm64-v8a/libpulseblocks.so",
       "runtimeFiles": []
     }
   },

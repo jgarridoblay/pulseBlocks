@@ -28,10 +28,6 @@ class Block {
         this.velocityY = velocityY;
     }
 
-    public void setVelocityY(float velocityY) {
-        this.velocityY = velocityY;
-    }
-
     public void setAlignToGrid(boolean align) {
         this.alignToGrid = align;
     }

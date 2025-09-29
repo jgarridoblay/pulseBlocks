@@ -1,1 +1,1 @@
-/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/build/intermediates/cxx/Debug/1u1443t2/obj/arm64-v8a
+/Users/juangarrido/Documents/juegos/pulseBlocks/app/build/intermediates/cxx/Debug/1u1443t2/obj/arm64-v8a

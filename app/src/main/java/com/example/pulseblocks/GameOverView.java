@@ -1,7 +1,6 @@
 package com.example.pulseblocks;
 
-import static java.security.AccessController.getContext;
-
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -36,9 +35,6 @@ class GameOverView extends LinearLayout {
         createGameOverUI();
         startGameOverAnimations();
     }
-
-}
-
 
     private void createGameOverUI() {
         // Título Game Over
@@ -137,6 +133,7 @@ class GameOverView extends LinearLayout {
         );
         addView(menuButton, menuParams);
      */
+    @SuppressLint("ClickableViewAccessibility")
     private void createAnimatedGameOverButton(String text, Runnable action, int index) {
         Button button = new Button(getContext());
         button.setText(text);
@@ -190,10 +187,33 @@ class GameOverView extends LinearLayout {
             title.startAnimation(titleAnimSet);
 
             // Shake después de la escala
-            title.postDelayed();
+            title.postDelayed(shakeView(title),1000);
 
         }
     }
+    // Método que aplica una animación de "shake"
+    private Runnable shakeView(View view) {
+        Animation shake = new TranslateAnimation(0, 15, 0, 0);
+        shake.setDuration(100);
+        shake.setRepeatMode(Animation.REVERSE);
+        shake.setRepeatCount(5);
+        view.startAnimation(shake);
+        return null;
+    }
+
+    private void animateButtonPress(Button button, boolean pressed) {
+        // Animación de escala (se encoge al presionar)
+        ScaleAnimation scaleAnim = new ScaleAnimation(
+                pressed ? 1.0f : 0.95f, pressed ? 0.95f : 1.0f,
+                pressed ? 1.0f : 0.95f, pressed ? 0.95f : 1.0f,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f
+        );
+        scaleAnim.setDuration(100);
+        scaleAnim.setFillAfter(true);
+        button.startAnimation(scaleAnim);
+
+        // Cambio de color al presionar
+        button.setBackgroundColor(pressed ? Color.GRAY : Color.DKGRAY);
+    }
 }
-
-

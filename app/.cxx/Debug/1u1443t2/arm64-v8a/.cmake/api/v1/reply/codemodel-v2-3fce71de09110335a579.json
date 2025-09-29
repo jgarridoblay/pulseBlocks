@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "pulseblocks::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-pulseblocks-Debug-923326cbf8055f884345.json",
+					"jsonFile" : "target-pulseblocks-Debug-6ee919480acaa441c1f9.json",
 					"name" : "pulseblocks",
 					"projectIndex" : 0
 				}
@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/.cxx/Debug/1u1443t2/arm64-v8a",
-		"source" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/src/main/cpp"
+		"build" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/arm64-v8a",
+		"source" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/src/main/cpp"
 	},
 	"version" : 
 	{

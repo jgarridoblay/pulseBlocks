@@ -2,7 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/build/intermediates/cxx/Debug/1u1443t2/obj/arm64-v8a/libpulseblocks.so"
+			"path" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/build/intermediates/cxx/Debug/1u1443t2/obj/x86/libpulseblocks.so"
 		}
 	],
 	"backtrace" : 1,
@@ -86,7 +86,7 @@
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "/Users/juangarrido/.gradle/caches/transforms-4/aec30794bfe8beec66ffad97653059db/transformed/games-activity-1.2.2/prefab/modules/game-activity/libs/android.arm64-v8a/libgame-activity.a",
+				"fragment" : "/Users/juangarrido/.gradle/caches/transforms-4/aec30794bfe8beec66ffad97653059db/transformed/games-activity-1.2.2/prefab/modules/game-activity/libs/android.x86/libgame-activity.a",
 				"role" : "libraries"
 			},
 			{

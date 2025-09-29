@@ -151,7 +151,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/.cxx/Debug/1u1443t2/x86"
+			"value" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/x86"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -635,7 +635,7 @@
 				}
 			],
 			"type" : "UNINITIALIZED",
-			"value" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/.cxx/Debug/1u1443t2/prefab/x86/prefab"
+			"value" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/prefab/x86/prefab"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -695,7 +695,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/src/main/cpp"
+			"value" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/src/main/cpp"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -731,7 +731,7 @@
 				}
 			],
 			"type" : "UNINITIALIZED",
-			"value" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/build/intermediates/cxx/Debug/1u1443t2/obj/x86"
+			"value" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/build/intermediates/cxx/Debug/1u1443t2/obj/x86"
 		},
 		{
 			"name" : "CMAKE_LINKER",
@@ -1003,7 +1003,7 @@
 				}
 			],
 			"type" : "UNINITIALIZED",
-			"value" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/build/intermediates/cxx/Debug/1u1443t2/obj/x86"
+			"value" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/build/intermediates/cxx/Debug/1u1443t2/obj/x86"
 		},
 		{
 			"name" : "CMAKE_SHARED_LINKER_FLAGS",
@@ -1287,7 +1287,7 @@
 				}
 			],
 			"type" : "PATH",
-			"value" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/.cxx/Debug/1u1443t2/prefab/x86/prefab/lib/i686-linux-android/cmake/game-activity"
+			"value" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/prefab/x86/prefab/lib/i686-linux-android/cmake/game-activity"
 		},
 		{
 			"name" : "pulseblocks_BINARY_DIR",
@@ -1299,7 +1299,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/.cxx/Debug/1u1443t2/x86"
+			"value" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/x86"
 		},
 		{
 			"name" : "pulseblocks_IS_TOP_LEVEL",
@@ -1323,7 +1323,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/src/main/cpp"
+			"value" : "/Users/juangarrido/Documents/juegos/pulseBlocks/app/src/main/cpp"
 		}
 	],
 	"kind" : "cache",
