@@ -1,0 +1,1 @@
+/Users/juangarrido/AndroidStudioProjects/pulseBlocks/app/src/main/cpp/CMakeLists.txt
