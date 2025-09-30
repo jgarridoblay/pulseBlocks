@@ -348,6 +348,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     // Verificar si forma un rectángulo completo
                     if (group.isCompleteRectangle()) {
                         Iterator<BlockGroup> groupIterator = fallingGroups.iterator();
+                        List<BlockGroup> groupsToRemove = new ArrayList<>();
                         int points = group.getBlockCount() * 10;
                         score += points;
                         level = score / 500 + 1; // Subir nivel cada 500 puntos
@@ -359,7 +360,14 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         createExplosionParticles(group.getCenterX(), group.getCenterY(), group.getColor());
 
                         updateScore();
-                        groupIterator.remove();
+                        group.startDisappearWithEffect();
+                        // Marcar para eliminar
+                        groupsToRemove.add(group);
+                        //groupIterator.remove();
+                        for (BlockGroup blocks : groupsToRemove) {
+                            fallingGroups.remove(blocks);
+                            System.out.println("Grupo eliminado. Grupos restantes: " + fallingGroups.size());
+                        }
                     }
                     // Salir del bucle de grupos (ya encontramos colisión)
                     break;

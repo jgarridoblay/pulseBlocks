@@ -6,7 +6,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 class BlockGroup {
     private List<Block> blocks;
@@ -18,6 +21,14 @@ class BlockGroup {
     private float groupGlow = 0; // Para efectos de grupo
     private boolean isCompleting = false; // Para animación de completado
     private long completionStartTime = 0;
+
+    private boolean isDisappearing = false;
+    private long disappearStartTime = 0;
+    private int disappearEffect = 0; // 0: Explosión, 1: Implosión, 2: Desvanecimiento
+    private float disappearProgress = 0;
+    private Map<Block, Float> blockAngles = new HashMap<>();
+    private Map<Block, Float> blockVelocityX = new HashMap<>();
+    private Map<Block, Float> blockVelocityY = new HashMap<>();
 
     public BlockGroup() {
         blocks = new ArrayList<>();
@@ -74,6 +85,199 @@ class BlockGroup {
         // Dibujar conexiones entre bloques
         drawBlockConnections(canvas, paint);
     }
+
+    public void startDisappearWithEffect() {
+        if (isDisappearing) return;
+
+        isDisappearing = true;
+        disappearStartTime = System.currentTimeMillis();
+        disappearEffect = new Random().nextInt(3); // 0, 1 o 2
+        disappearProgress = 0;
+
+        // Inicializar datos específicos según el efecto
+        switch (disappearEffect) {
+            case 0: // Explosión
+                initExplosionEffect();
+                break;
+            case 1: // Implosión
+                initImplosionEffect();
+                break;
+            case 2: // Desvanecimiento
+                initFadeEffect();
+                break;
+        }
+    }
+
+    /**
+     * Inicializa el efecto de explosión (los bloques salen disparados)
+     */
+    private void initExplosionEffect() {
+        Random rand = new Random();
+        float centerX = (minX + maxX) / 2f;
+        float centerY = (minY + maxY) / 2f;
+
+        for (Block block : blocks) {
+            // Calcular dirección desde el centro
+            float dx = block.getX() - centerX;
+            float dy = block.getY() - centerY;
+            float distance = (float) Math.sqrt(dx * dx + dy * dy);
+
+            if (distance == 0) distance = 1;
+
+            // Velocidad hacia afuera con algo de aleatoriedad
+            float speed = 5 + rand.nextFloat() * 3;
+            blockVelocityX.put(block, (dx / distance) * speed);
+            blockVelocityY.put(block, (dy / distance) * speed);
+            blockAngles.put(block, rand.nextFloat() * 360);
+        }
+    }
+
+    /**
+     * Inicializa el efecto de implosión (los bloques se contraen al centro)
+     */
+    private void initImplosionEffect() {
+        Random rand = new Random();
+        float centerX = (minX + maxX) / 2f;
+        float centerY = (minY + maxY) / 2f;
+
+        for (Block block : blocks) {
+            // Calcular dirección hacia el centro
+            float dx = centerX - block.getX();
+            float dy = centerY - block.getY();
+            float distance = (float) Math.sqrt(dx * dx + dy * dy);
+
+            if (distance == 0) distance = 1;
+
+            // Velocidad hacia el centro
+            float speed = 4 + rand.nextFloat() * 2;
+            blockVelocityX.put(block, (dx / distance) * speed);
+            blockVelocityY.put(block, (dy / distance) * speed);
+            blockAngles.put(block, rand.nextFloat() * 360);
+        }
+    }
+
+    /**
+     * Inicializa el efecto de desvanecimiento (fade out con rotación)
+     */
+    private void initFadeEffect() {
+        Random rand = new Random();
+        for (Block block : blocks) {
+            blockAngles.put(block, rand.nextFloat() * 360);
+            blockVelocityX.put(block, (rand.nextFloat() - 0.5f) * 2);
+            blockVelocityY.put(block, rand.nextFloat() * 2);
+        }
+    }
+
+    /**
+     * Actualiza la animación de desaparición
+     * @return true si la animación ha terminado
+     */
+    public boolean updateDisappearEffect() {
+        if (!isDisappearing) return false;
+
+        long elapsed = System.currentTimeMillis() - disappearStartTime;
+        float duration = 1000; // 1 segundo de animación
+
+        disappearProgress = Math.min(elapsed / duration, 1.0f);
+
+        switch (disappearEffect) {
+            case 0: // Explosión
+                updateExplosionEffect();
+                break;
+            case 1: // Implosión
+                updateImplosionEffect();
+                break;
+            case 2: // Desvanecimiento
+                updateFadeEffect();
+                break;
+        }
+
+        // Retornar true si la animación terminó
+        if (disappearProgress >= 1.0f) {
+            blocks.clear();
+            isDisappearing = false;
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Actualiza posiciones para el efecto de explosión
+     */
+    private void updateExplosionEffect() {
+        for (Block block : blocks) {
+            float vx = blockVelocityX.get(block);
+            float vy = blockVelocityY.get(block);
+
+            block.setX(block.getX() + vx * disappearProgress);
+            block.setY(block.getY() + vy * disappearProgress);
+
+            // Rotar bloques
+            float angle = blockAngles.get(block) + disappearProgress * 360;
+            blockAngles.put(block, angle);
+            block.setRotation(angle);
+
+            // Desvanecer
+            block.setAlpha(1.0f - disappearProgress);
+        }
+    }
+
+    /**
+     * Actualiza posiciones para el efecto de implosión
+     */
+    private void updateImplosionEffect() {
+        float centerX = (minX + maxX) / 2f;
+        float centerY = (minY + maxY) / 2f;
+
+        for (Block block : blocks) {
+            float vx = blockVelocityX.get(block);
+            float vy = blockVelocityY.get(block);
+
+            // Acelerar hacia el centro
+            float acceleration = disappearProgress * 2;
+            block.setX(block.getX() + vx * acceleration);
+            block.setY(block.getY() + vy * acceleration);
+
+            // Rotar más rápido mientras se acerca
+            float angle = blockAngles.get(block) + disappearProgress * 720;
+            blockAngles.put(block, angle);
+            block.setRotation(angle);
+
+            // Encoger y desvanecer
+            float scale = 1.0f - disappearProgress;
+            block.setScale(scale);
+            block.setAlpha(1.0f - disappearProgress);
+        }
+    }
+
+    /**
+     * Actualiza el efecto de desvanecimiento
+     */
+    private void updateFadeEffect() {
+        for (Block block : blocks) {
+            // Movimiento suave hacia arriba y ligeramente lateral
+            float vx = blockVelocityX.get(block);
+            float vy = blockVelocityY.get(block);
+
+            block.setX(block.getX() + vx * disappearProgress);
+            block.setY(block.getY() - vy * disappearProgress * 2);
+
+            // Rotación suave
+            float angle = blockAngles.get(block) + disappearProgress * 180;
+            blockAngles.put(block, angle);
+            block.setRotation(angle);
+
+            // Fade out con curva ease-out
+            float alpha = 1.0f - (float) Math.pow(disappearProgress, 2);
+            block.setAlpha(alpha);
+
+            // Escalar ligeramente
+            float scale = 1.0f + disappearProgress * 0.2f;
+            block.setScale(scale);
+        }
+    }
+
     private void drawGroupGlow(Canvas canvas, Paint paint) {
         if (blocks.isEmpty()) return;
 
