@@ -10,6 +10,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.TextView;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -44,9 +45,9 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     // Game state
     private int score = 0;
-    private int level = 1;
+    private int level = 0;
     private long lastGroupSpawn = 0;
-    private long groupSpawnDelay = 3000; // 3 segundos
+    private long groupSpawnDelay = 12000; // 3 segundos
     private Random random;
     private boolean gameRunning = true;
 
@@ -135,6 +136,42 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+    public int[][] matrixBlockGenerator(int N, int M) {
+        Random rand = new Random();
+        int[][] matriz = new int[N][M];
+        // 1. Primera fila: todos 1
+        for (int j = 0; j < N; j++) {
+            matriz[j][0] = 1;
+        }
+        // 2. Segunda fila: mezcla de 1 y 0 (no todos iguales)
+        boolean valida;
+        do {
+            valida = true;
+            int suma = 0;
+            for (int j = 0; j < N; j++) {
+                matriz[j][1] = rand.nextInt(2);
+                // 0 o 1
+                suma += matriz[j][1];
+            }
+            if (suma == 0 || suma == N) {
+                valida = false;
+                // todos 0 o todos 1 → repetir
+            }
+        } while (!valida);
+        // 3. Tercera fila en adelante
+        for (int i = 2; i < M; i++) {
+            for (int j = 0; j < N; j++) {
+                if (matriz[j][i - 1] == 1) {
+                    matriz[j][i] = rand.nextInt(2);
+                    // 0 o 1
+                } else {
+                    matriz[j][i] = 0;
+                }
+            }
+        }
+        return matriz;
+    }
+
     // Convertir coordenadas de cuadrícula a píxeles
     private int gridToPixelX(int gridX) {
         return gridOffsetX + (gridX * blockSize);
@@ -146,11 +183,11 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     // Convertir píxeles a coordenadas de cuadrícula
     private int pixelToGridX(float pixelX) {
-        return (int)((pixelX - gridOffsetX) / blockSize);
+        return (int) ((pixelX - gridOffsetX) / blockSize);
     }
 
     private int pixelToGridY(float pixelY) {
-        return (int)((pixelY - gridOffsetY) / blockSize);
+        return (int) ((pixelY - gridOffsetY) / blockSize);
     }
 
     private void shootBlock() {
@@ -170,7 +207,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         lastShootTime = System.currentTimeMillis();
 
         // Crear efecto de partículas al disparar
-        createShootParticles(pixelX + blockSize/2, cannonY);
+        createShootParticles(pixelX + blockSize / 2, cannonY);
     }
 
     private void createShootParticles(float x, float y) {
@@ -202,48 +239,29 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
             // Aumentar dificultad
             if (groupSpawnDelay > 1000) {
-                groupSpawnDelay -= 30;
+                groupSpawnDelay -= 50;
             }
         }
     }
 
     private BlockGroup createRandomGroup() {
-        int gridX = random.nextInt(Math.max(1, gridWidth - 4)); // Dejar espacio para las formas
-        int type = random.nextInt(4); // 4 tipos diferentes
+        int[][] matrix = matrixBlockGenerator(2 + level, 2 + level);
+        int gridX = random.nextInt(Math.max(1, gridWidth - matrix[0].length)); // Dejar espacio para las formas
+        //int type = random.nextInt(4); // 4 tipos diferentes
 
         BlockGroup group = new BlockGroup();
-        group.setFallSpeed(2 + (level * 0.5f));
+        group.setFallSpeed(0.6f + (level * 0.4f));
 
         int pixelX = gridToPixelX(gridX);
         int pixelY = gridToPixelY(-2); // Empezar fuera de la pantalla
 
-        type = 0;
-        switch (type) {
-            case 0: // Línea en L
-                group.addBlock(new Block(pixelX, pixelY, blockSize, Color.RED));
-                group.addBlock(new Block(pixelX, pixelY + blockSize, blockSize, Color.RED));
-                group.addBlock(new Block(pixelX + blockSize, pixelY, blockSize, Color.RED));
-                break;
-            case 1: // T invertida
-                group.addBlock(new Block(pixelX + blockSize, pixelY, blockSize, Color.GREEN));
-                group.addBlock(new Block(pixelX, pixelY + blockSize, blockSize, Color.GREEN));
-                group.addBlock(new Block(pixelX + blockSize, pixelY + blockSize, blockSize, Color.GREEN));
-                group.addBlock(new Block(pixelX + blockSize * 2, pixelY + blockSize, blockSize, Color.GREEN));
-                break;
-            case 2: // U invertida
-                group.addBlock(new Block(pixelX, pixelY, blockSize, Color.BLUE));
-                group.addBlock(new Block(pixelX + blockSize * 2, pixelY, blockSize, Color.BLUE));
-                group.addBlock(new Block(pixelX, pixelY + blockSize, blockSize, Color.BLUE));
-                group.addBlock(new Block(pixelX + blockSize, pixelY + blockSize, blockSize, Color.BLUE));
-                group.addBlock(new Block(pixelX + blockSize * 2, pixelY + blockSize, blockSize, Color.BLUE));
-                break;
-            default: // Línea simple
-                group.addBlock(new Block(pixelX, pixelY, blockSize, Color.YELLOW));
-                group.addBlock(new Block(pixelX + blockSize, pixelY, blockSize, Color.YELLOW));
-                group.addBlock(new Block(pixelX + blockSize * 2, pixelY, blockSize, Color.YELLOW));
-                break;
+        for (int line = 0; line < matrix.length; line++) {
+            for (int column = 0; column < matrix[0].length; column++) {
+                if (matrix[line][column] == 1) {
+                    group.addBlock(new Block(pixelX + blockSize * line, pixelY + blockSize * column, blockSize, Color.RED));
+                }
+            }
         }
-
         return group;
     }
 
@@ -319,7 +337,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     }
 
                     // Crear efecto visual
-                    createCollisionParticles(block.x + blockSize/2, block.y + blockSize/2);
+                    createCollisionParticles(block.x + blockSize / 2, block.y + blockSize / 2);
 
                     // IMPORTANTE: Agregar el bloque al grupo
                     group.addBlock(block);
@@ -327,6 +345,22 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     // Remover de la lista de bloques del jugador
                     playerIterator.remove();
 
+                    // Verificar si forma un rectángulo completo
+                    if (group.isCompleteRectangle()) {
+                        Iterator<BlockGroup> groupIterator = fallingGroups.iterator();
+                        int points = group.getBlockCount() * 10;
+                        score += points;
+                        level = score / 500 + 1; // Subir nivel cada 500 puntos
+
+                        // Crear popup de puntuación
+                        createScorePopup(group.getCenterX(), group.getCenterY(), points);
+
+                        // Crear explosión de partículas
+                        createExplosionParticles(group.getCenterX(), group.getCenterY(), group.getColor());
+
+                        updateScore();
+                        groupIterator.remove();
+                    }
                     // Salir del bucle de grupos (ya encontramos colisión)
                     break;
                 }
@@ -347,22 +381,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     mainActivity.showGameOver(score);
                 });
                 return;
-            }
-
-            // Verificar si forma un rectángulo completo
-            if (group.isCompleteRectangle()) {
-                int points = group.getBlockCount() * 10;
-                score += points;
-                level = score / 500 + 1; // Subir nivel cada 500 puntos
-
-                // Crear popup de puntuación
-                createScorePopup(group.getCenterX(), group.getCenterY(), points);
-
-                // Crear explosión de partículas
-                createExplosionParticles(group.getCenterX(), group.getCenterY(), group.getColor());
-
-                updateScore();
-                groupIterator.remove();
             }
         }
 
@@ -744,3 +762,4 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 }
+

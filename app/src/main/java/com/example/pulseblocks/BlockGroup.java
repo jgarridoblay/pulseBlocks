@@ -148,7 +148,7 @@ class BlockGroup {
             if (dx < blockSize * 0.5f && playerBlock.y < block.y && dy < blockSize) {
                 return true;
             }
-
+//
             // Colisión lateral
             if (dy < blockSize * 0.5f && dx < blockSize) {
                 return true;
@@ -212,12 +212,12 @@ class BlockGroup {
         if (blocks.isEmpty()) return false;
 
         updateBounds();
-        int expectedWidth = (maxX - minX) / blockSize + 1;
-        int expectedHeight = (maxY - minY) / blockSize + 1;
-        int expectedBlocks = expectedWidth * expectedHeight;
+        //int expectedWidth = (maxX - minX) / blockSize + 1;
+        //int expectedHeight = (maxY - minY) / blockSize + 1;
+        //int expectedBlocks = expectedWidth * expectedHeight;
 
         // Verificar si tenemos suficientes bloques para un rectángulo
-        return blocks.size() >= expectedBlocks && isRectangularShape();
+        return isRectangularShape();
     }
 
     private boolean isRectangularShape() {
@@ -225,8 +225,8 @@ class BlockGroup {
         // En una implementación completa, esto sería más sofisticado
         updateBounds();
         int blockSize = blocks.get(0).size;
-        int rows = (maxY - minY) / blockSize + 1;
-        int cols = (maxX - minX) / blockSize + 1;
+        int rows = (maxY - minY) / blockSize;
+        int cols = (maxX - minX) / blockSize;
 
         // Crear matriz para verificar la forma
         boolean[][] matrix = new boolean[rows][cols];
