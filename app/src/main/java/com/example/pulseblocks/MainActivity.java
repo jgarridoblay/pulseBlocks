@@ -4,12 +4,14 @@ package com.example.pulseblocks;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -65,6 +67,18 @@ public class MainActivity extends Activity {
         showMenu();
 
         setContentView(mainLayout);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //gameView.resume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //gameView.pause();
     }
 
     private void createViews() {

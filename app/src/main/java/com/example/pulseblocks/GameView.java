@@ -2,10 +2,16 @@
 package com.example.pulseblocks;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.RadialGradient;
+import android.graphics.RectF;
+import android.graphics.Shader;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -18,10 +24,10 @@ import java.util.Random;
 
 class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private GameThread gameThread;
-    private Paint paint;
+    private final Paint paint;
     private int screenWidth, screenHeight;
-    private int blockSize = 60;
-    private MainActivity mainActivity;
+    private int blockSize = Resources.getSystem().getDisplayMetrics().widthPixels / 17;
+    private final MainActivity mainActivity;
     private TextView scoreText;
 
     // Grid system
@@ -29,34 +35,33 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private int gridOffsetX, gridOffsetY;
 
     // Cannon
+
     private int cannonGridX; // Posición del cañón en la cuadrícula
     private int cannonY;
-    private int cannonWidth = blockSize;
-    private int cannonHeight = blockSize * 2;
+    private final int cannonWidth = blockSize;
+    private final int cannonHeight = blockSize * 2;
     private float cannonShakeX = 0; // Para animación de disparo
     private long lastShootTime = 0;
 
     // Game objects
-    private List<Block> playerBlocks;
-    private List<BlockGroup> fallingGroups;
-    private List<Block> staticBlocks;
-    private List<ParticleEffect> particles;
-    private List<ScorePopup> scorePopups;
+    private final List<Block> playerBlocks;
+    private final List<BlockGroup> fallingGroups;
+    private final List<ParticleEffect> particles;
+    private final List<ScorePopup> scorePopups;
 
     // Game state
     private int score = 0;
     private int level = 0;
     private long lastGroupSpawn = 0;
     private long groupSpawnDelay = 12000; // 3 segundos
-    private Random random;
+    private final Random random;
     private boolean gameRunning = true;
 
     // Animation variables
-    private long gameStartTime;
-    private float pulseRadius = 0;
-    private float pulseAlpha = 255;
     private List<BackgroundStar> stars;
     private float backgroundHue = 0;
+    private boolean cannonCanShot = true;
+    private int cannonOverheat = 0;
 
     public GameView(Context context) {
         super(context);
@@ -67,12 +72,10 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         playerBlocks = new ArrayList<>();
         fallingGroups = new ArrayList<>();
-        staticBlocks = new ArrayList<>();
         particles = new ArrayList<>();
         scorePopups = new ArrayList<>();
         stars = new ArrayList<>();
         random = new Random();
-        gameStartTime = System.currentTimeMillis();
 
         // Crear estrellas de fondo
         createBackgroundStars();
@@ -123,7 +126,10 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             if (event.getY() < screenHeight - 200) { // Solo disparar si no toca los botones
-                shootBlock();
+                if (cannonOverheat < 180) {
+                    shootBlock();
+                    cannonOverheat = 10 + cannonOverheat * 2;
+                }
             }
         }
         return true;
@@ -409,11 +415,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 star.x = random.nextFloat() * screenWidth;
             }
         }
-
-        // Actualizar pulso
-        long time = System.currentTimeMillis();
-        pulseRadius = ((time % 2000) / 2000.0f) * 150;
-        pulseAlpha = 255 - (pulseRadius / 150.0f * 200);
     }
 
     private void updateParticles() {
@@ -514,6 +515,8 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         // Dibujar efectos de pulso
         drawEnhancedPulseEffect(canvas);
+
+        // Dibujar el cañón (siempre al final para que esté encima)
     }
 
     private void drawAnimatedBackground(Canvas canvas) {
@@ -559,61 +562,137 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private void drawAnimatedCannon(Canvas canvas) {
         int cannonPixelX = gridToPixelX(cannonGridX) + (int) cannonShakeX;
 
-        paint.setColor(Color.WHITE);
-        paint.setStyle(Paint.Style.FILL);
+        //paint.setColor(Color.WHITE);
+        //paint.setStyle(Paint.Style.FILL);
 
-        // Base del cañón con efecto de brillo
-        int baseWidth = blockSize;
         int baseHeight = blockSize / 2;
-        canvas.drawRect(
+        int baseWidth = (int) (blockSize * 1.2);
+
+        int tubeWidth = blockSize - 5;
+        int tubeHeight = blockSize;
+
+// Tubo con gradiente brillante
+        Paint tubePaint = new Paint();
+        tubePaint.setShader(new LinearGradient(
                 cannonPixelX,
-                cannonY + cannonHeight - baseHeight,
-                cannonPixelX + baseWidth,
-                cannonY + cannonHeight,
-                paint
+                cannonY,
+                cannonPixelX + tubeWidth,
+                cannonY + tubeHeight,
+                Color.WHITE,
+                Color.CYAN,
+                Shader.TileMode.CLAMP
+        ));
+// Tubo redondeado
+        RectF tubeRect = new RectF(
+                cannonPixelX,
+                cannonY,
+                cannonPixelX + tubeWidth,
+                cannonY + tubeHeight + blockSize
+        );
+        canvas.drawRoundRect(tubeRect, 15, 15, tubePaint);
+
+// Pintura con gradiente para la base
+        Paint basePaint = new Paint();
+        basePaint.setShader(new LinearGradient(
+                (float) cannonPixelX,
+                (float) cannonY + cannonHeight - baseHeight,
+                (float) (cannonPixelX + baseWidth),
+                (float) cannonY + cannonHeight,
+                Color.CYAN,
+                Color.BLUE,
+                Shader.TileMode.CLAMP
+        ));
+
+// Base redondeada
+        RectF baseRect = new RectF(
+                cannonPixelX - (baseWidth) / 2f,
+                cannonY + cannonHeight / 2f - baseHeight,
+                cannonPixelX + (baseWidth) / 2f+ blockSize,
+                cannonY + cannonHeight / 2f
+        );
+        canvas.drawRoundRect(baseRect, blockSize / 2f, blockSize / 2f, tubePaint);
+
+        RectF baseRect2 = new RectF(
+                cannonPixelX - (baseWidth) / 3f,
+                cannonY + cannonHeight * 3 / 4f - baseHeight * 2,
+                cannonPixelX + (baseWidth) / 3f + blockSize,
+                cannonY + cannonHeight * 3 / 4f
+        );
+        canvas.drawRoundRect(baseRect2, blockSize / 2f, blockSize / 2f, tubePaint);
+
+// Núcleo energético en la base
+        Paint energyPaint = new Paint();
+        energyPaint.setShader(new LinearGradient(
+                cannonPixelX,                               // X0
+                cannonY,                                    // Y0 (arriba del cañón)
+                cannonPixelX,                               // X1
+                cannonY + cannonHeight,                     // Y1 (abajo del cañón)
+                Color.argb(cannonOverheat, 255, 0, 0),                                  // Color inicial (arriba)
+                Color.TRANSPARENT,                          // Color final (abajo)
+                Shader.TileMode.CLAMP                       // Extiende transparente hacia fuera
+        ));
+        if (cannonOverheat > 0) {
+            cannonOverheat += -1;
+        }
+        canvas.drawCircle(
+                cannonPixelX + baseWidth / 2f,
+                cannonY + cannonHeight - tubeHeight,
+                baseWidth,
+                energyPaint
         );
 
-        // Tubo del cañón
-        int tubeWidth = blockSize / 2;
-        int tubeHeight = cannonHeight - baseHeight;
-        int tubeX = cannonPixelX + (baseWidth - tubeWidth) / 2;
-        canvas.drawRect(
-                tubeX,
-                cannonY,
-                tubeX + tubeWidth,
-                cannonY + tubeHeight,
-                paint
-        );
+// Líneas de energía alrededor del tubo
+        Paint glowPaint = new Paint();
+        glowPaint.setColor(Color.CYAN);
+        glowPaint.setAlpha(120);
+        glowPaint.setStrokeWidth(4f);
+        for (int i = -2; i <= 2; i++) {
+            canvas.drawLine(
+                    cannonPixelX - 10,
+                    cannonY + tubeHeight / 2f + i * 10,
+                    cannonPixelX,
+                    cannonY + tubeHeight / 2f + i * 10,
+                    glowPaint
+            );
+            canvas.drawLine(
+                    cannonPixelX + tubeWidth,
+                    cannonY + tubeHeight / 2f + i * 10,
+                    cannonPixelX + tubeWidth + 10,
+                    cannonY + tubeHeight / 2f + i * 10,
+                    glowPaint
+            );
+        }
+
 
         // Efecto de brillo en el cañón
-        drawCannonGlow(canvas, cannonPixelX, cannonY);
+        //drawCannonGlow(canvas, cannonPixelX, cannonY);
 
         // Borde del cañón con pulso
-        long time = System.currentTimeMillis();
-        float glowIntensity = (float) (Math.sin(time * 0.01) * 0.5 + 0.5);
-        int glowAlpha = (int) (100 + glowIntensity * 155);
-
-        paint.setColor(Color.argb(glowAlpha, 0, 255, 255));
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(3);
-
-        // Borde de la base
-        canvas.drawRect(
-                cannonPixelX,
-                cannonY + cannonHeight - baseHeight,
-                cannonPixelX + baseWidth,
-                cannonY + cannonHeight,
-                paint
-        );
-
-        // Borde del tubo
-        canvas.drawRect(
-                tubeX,
-                cannonY,
-                tubeX + tubeWidth,
-                cannonY + tubeHeight,
-                paint
-        );
+        //long time = System.currentTimeMillis();
+        //float glowIntensity = (float) (Math.sin(time * 0.01) * 0.5 + 0.5);
+        //int glowAlpha = (int) (100 + glowIntensity * 155);
+//
+        //paint.setColor(Color.argb(glowAlpha, 0, 255, 255));
+        //paint.setStyle(Paint.Style.STROKE);
+        //paint.setStrokeWidth(3);
+//
+        //// Borde de la base
+        //canvas.drawRect(
+        //        cannonPixelX,
+        //        cannonY + cannonHeight - baseHeight,
+        //        cannonPixelX + baseWidth,
+        //        cannonY + cannonHeight,
+        //        paint
+        //);
+//
+        //// Borde del tubo
+        //canvas.drawRect(
+        //        tubeX,
+        //        cannonY,
+        //        tubeX + tubeWidth,
+        //        cannonY + tubeHeight,
+        //        paint
+        //);
     }
 
     private void drawCannonGlow(Canvas canvas, int cannonX, int cannonY) {

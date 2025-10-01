@@ -75,21 +75,6 @@ class MenuView extends LinearLayout {
         addView(subtitle, subtitleParams);
     }
 
-    private void createMenuButton(String text, Runnable action) {
-        Button button = new Button(getContext());
-        button.setText(text);
-        button.setTextSize(20);
-        button.setBackgroundColor(Color.DKGRAY);
-        button.setTextColor(Color.WHITE);
-        button.setOnClickListener(v -> action.run());
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                400, 80
-        );
-        params.setMargins(0, 10, 0, 10);
-        addView(button, params);
-    }
-
     private void createAnimatedMenuButton(String text, Runnable action, int index) {
         Button button = new Button(getContext());
         button.setText(text);
