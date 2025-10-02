@@ -566,20 +566,34 @@ class BackgroundStar {
     public float size;
     public float brightness;
     public float speed;
+    public int color;
+    private float alpha; // para parpadeo
+    private boolean fading;
 
-    public BackgroundStar(float x, float y, float brightness) {
+    public BackgroundStar(float x, float y, float brightness, float speed, int color) {
         this.x = x;
         this.y = y;
         this.brightness = brightness;
         this.size = brightness * 2;
         this.speed = 0.5f + brightness;
+        this.color = color;
+        this.alpha = 0.5f + new Random().nextFloat() * 0.5f;
+        this.fading = new Random().nextBoolean();
     }
 
     public void update() {
         y += speed;
+        if (y > 1920) y = 0;
 
         // Efecto de parpadeo
-        brightness += (Math.random() - 0.5) * 0.1;
+        brightness += (float) ((Math.random() - 0.5) * 0.1);
         brightness = Math.max(0.1f, Math.min(1.0f, brightness));
+        if (fading) {
+            alpha -= 0.01f;
+            if (alpha <= 0.3f) fading = false;
+        } else {
+            alpha += 0.01f;
+            if (alpha >= 1f) fading = true;
+        }
     }
 }

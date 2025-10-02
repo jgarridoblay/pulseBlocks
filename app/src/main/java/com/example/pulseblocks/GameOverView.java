@@ -93,53 +93,19 @@ class GameOverView extends LinearLayout {
         createAnimatedGameOverButton("MENÚ PRINCIPAL", () -> mainActivity.showMenu(), 2);
     }
 
-    /*
-        // Botones
-        Button playAgainButton = new Button(getContext());
-        playAgainButton.setText("JUGAR DE NUEVO");
-        playAgainButton.setTextSize(18);
-        playAgainButton.setBackgroundColor(Color.DKGRAY);
-        playAgainButton.setTextColor(Color.WHITE);
-        playAgainButton.setOnClickListener(v -> mainActivity.startGame());
-
-        LinearLayout.LayoutParams playParams = new LinearLayout.LayoutParams(
-                350, 80
-        );
-        playParams.setMargins(0, 20, 0, 10);
-        addView(playAgainButton, playParams);
-
-        Button recordsButton = new Button(getContext());
-        recordsButton.setText("VER RÉCORDS");
-        recordsButton.setTextSize(18);
-        recordsButton.setBackgroundColor(Color.DKGRAY);
-        recordsButton.setTextColor(Color.WHITE);
-        recordsButton.setOnClickListener(v -> mainActivity.showRecords());
-
-        LinearLayout.LayoutParams recordsParams = new LinearLayout.LayoutParams(
-                350, 80
-        );
-        recordsParams.setMargins(0, 0, 0, 10);
-        addView(recordsButton, recordsParams);
-
-        Button menuButton = new Button(getContext());
-        menuButton.setText("MENÚ PRINCIPAL");
-        menuButton.setTextSize(18);
-        menuButton.setBackgroundColor(Color.DKGRAY);
-        menuButton.setTextColor(Color.WHITE);
-        menuButton.setOnClickListener(v -> mainActivity.showMenu());
-
-        LinearLayout.LayoutParams menuParams = new LinearLayout.LayoutParams(
-                350, 80
-        );
-        addView(menuButton, menuParams);
-     */
     @SuppressLint("ClickableViewAccessibility")
     private void createAnimatedGameOverButton(String text, Runnable action, int index) {
         Button button = new Button(getContext());
         button.setText(text);
         button.setTextSize(18);
-        button.setBackgroundColor(Color.DKGRAY);
         button.setTextColor(Color.WHITE);
+        button.setBackgroundResource(R.drawable.futuristic_button);
+        button.setAllCaps(false); // Evita que Android ponga todo en mayúsculas
+        button.setPadding(32, 16, 32, 16);
+        button.setEllipsize(null);
+        button.setSingleLine(false);
+        button.setHorizontallyScrolling(false);
+        button.setGravity(Gravity.CENTER);
         button.setTag("gameOverButton_" + index);
 
         // Efecto de hover

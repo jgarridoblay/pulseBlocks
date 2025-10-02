@@ -91,7 +91,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         screenWidth = getWidth();
-        screenHeight = getHeight();
+        screenHeight = getHeight() - 3 * blockSize;
 
         // Configurar sistema de cuadrícula
         gridWidth = screenWidth / blockSize;
@@ -242,12 +242,20 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void createBackgroundStars() {
-        for (int i = 0; i < 50; i++) {
-            stars.add(new BackgroundStar(
-                    random.nextFloat() * 1000,
-                    random.nextFloat() * 1000,
-                    random.nextFloat() * 0.5f + 0.5f
-            ));
+        int totalStars = 150; // Más estrellas para mayor densidad
+
+        for (int i = 0; i < totalStars; i++) {
+            float x = random.nextFloat() * 1080; // ancho de pantalla aproximado
+            float y = random.nextFloat() * 1920; // alto de pantalla aproximado
+            float size = random.nextFloat() * 2.5f + 0.5f; // tamaño variable
+            float speed = random.nextFloat() * 0.3f; // velocidad de movimiento
+            int color = Color.rgb(
+                    (int)(50 + random.nextFloat() * 205), // rojo
+                    (int)(150 + random.nextFloat() * 105), // verde
+                    255 // azul neón
+            );
+
+            stars.add(new BackgroundStar(x, y, size, speed, color));
         }
     }
 
@@ -401,7 +409,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
             group.update();
 
             // Verificar si llegó al suelo
-            if (group.getBottomY() >= screenHeight - 150) {
+            if (group.getBottomY() >= screenHeight - 6 * blockSize) {
                 // Game Over
                 gameRunning = false;
                 mainActivity.runOnUiThread(() -> {

@@ -2,6 +2,7 @@
 // MenuViews.java
 package com.example.pulseblocks;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -75,12 +76,20 @@ class MenuView extends LinearLayout {
         addView(subtitle, subtitleParams);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void createAnimatedMenuButton(String text, Runnable action, int index) {
         Button button = new Button(getContext());
         button.setText(text);
-        button.setTextSize(20);
-        button.setBackgroundColor(Color.DKGRAY);
+        button.setTextSize(18);
         button.setTextColor(Color.WHITE);
+        button.setBackgroundResource(R.drawable.futuristic_button);
+        button.setAllCaps(false); // Evita que Android ponga todo en mayúsculas
+        button.setPadding(32, 16, 32, 16);
+        button.setEllipsize(null);
+        button.setSingleLine(false);
+        button.setHorizontallyScrolling(false);
+        button.setGravity(Gravity.CENTER);
+
         button.setTag("button_" + index); // Tag para animaciones
 
         // Efecto de hover/press
