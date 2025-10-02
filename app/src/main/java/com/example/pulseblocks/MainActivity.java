@@ -9,6 +9,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
@@ -19,6 +21,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -188,29 +193,67 @@ public class MainActivity extends Activity {
     }
 
     private void createGameControls() {
+        int blockSize = gameView.getBlockSize();
         // Botón izquierdo
         Button leftButton = new Button(this);
-        leftButton.setText("←");
-        leftButton.setTextSize(24);
-        leftButton.setBackgroundColor(Color.DKGRAY);
+        leftButton.setText("");
+        leftButton.setTextSize(blockSize / 2f);
         leftButton.setTextColor(Color.WHITE);
-        RelativeLayout.LayoutParams leftParams = new RelativeLayout.LayoutParams(100, 100);
+
+// Fondo futurista con gradiente y bordes
+        GradientDrawable bg = new GradientDrawable(
+                GradientDrawable.Orientation.LEFT_RIGHT,
+                new int[]{Color.parseColor("#0F2027"), Color.parseColor("#2C5364")}
+        );
+        bg.setCornerRadius(40f);
+        bg.setStroke(4, Color.CYAN);
+
+        leftButton.setBackground(bg);
+
+// Añadir el drawable de la flecha
+        Drawable arrow = ContextCompat.getDrawable(this, R.drawable.arrow_left);
+        leftButton.setCompoundDrawablesWithIntrinsicBounds(arrow, null, null, null);
+        leftButton.setCompoundDrawablePadding(16);
+
+// Layout params
+        RelativeLayout.LayoutParams leftParams =
+                new RelativeLayout.LayoutParams(blockSize * 3, blockSize * 3);
         leftParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         leftParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
         leftParams.setMargins(20, 0, 0, 20);
+
         mainLayout.addView(leftButton, leftParams);
 
         // Botón derecho
         Button rightButton = new Button(this);
-        rightButton.setText("→");
-        rightButton.setTextSize(24);
-        rightButton.setBackgroundColor(Color.DKGRAY);
+        rightButton.setText(""); // sin texto
+        rightButton.setTextSize(blockSize / 2f);
         rightButton.setTextColor(Color.WHITE);
-        RelativeLayout.LayoutParams rightParams = new RelativeLayout.LayoutParams(100, 100);
+
+// Fondo futurista
+        GradientDrawable bgRight = new GradientDrawable(
+                GradientDrawable.Orientation.LEFT_RIGHT,
+                new int[]{Color.parseColor("#0F2027"), Color.parseColor("#2C5364")}
+        );
+        bgRight.setCornerRadius(40f);
+        bgRight.setStroke(4, Color.CYAN);
+
+        rightButton.setBackground(bgRight);
+
+// Añadir la flecha a la derecha
+        Drawable arrowRight = ContextCompat.getDrawable(this, R.drawable.arrow_right);
+        rightButton.setCompoundDrawablesWithIntrinsicBounds(null, null, arrowRight, null);
+        rightButton.setCompoundDrawablePadding(16);
+
+// Layout params
+        RelativeLayout.LayoutParams rightParams =
+                new RelativeLayout.LayoutParams(blockSize * 3, blockSize * 3);
         rightParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         rightParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         rightParams.setMargins(0, 0, 20, 20);
+
         mainLayout.addView(rightButton, rightParams);
+
 
         // Texto de puntuación
         TextView scoreText = new TextView(this);

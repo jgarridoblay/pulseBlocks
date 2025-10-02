@@ -27,7 +27,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private GameThread gameThread;
     private final Paint paint;
     private int screenWidth, screenHeight;
-    private int blockSize = Resources.getSystem().getDisplayMetrics().widthPixels / 17;
+    private final int blockSize = Resources.getSystem().getDisplayMetrics().widthPixels / 17;
     private final MainActivity mainActivity;
     private TextView scoreText;
 
@@ -143,6 +143,10 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
             }
         }
         return true;
+    }
+
+    public int getBlockSize () {
+        return blockSize;
     }
 
     public void moveCannon(int direction) {
