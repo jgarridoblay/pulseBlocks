@@ -1,6 +1,7 @@
 // GameView.java
 package com.example.pulseblocks;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -42,6 +43,8 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private final int cannonHeight = blockSize * 2;
     private float cannonShakeX = 0; // Para animación de disparo
     private long lastShootTime = 0;
+    private long lastTouchTime = 0; // Guardamos el tiempo del último toque
+    private static final long MIN_CLICK_INTERVAL = 250; // 500 ms = 0.5 segundos
 
     // Game objects
     private final List<Block> playerBlocks;
@@ -126,9 +129,16 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             if (event.getY() < screenHeight - 200) { // Solo disparar si no toca los botones
-                if (cannonOverheat < 180) {
-                    shootBlock();
-                    cannonOverheat = 10 + cannonOverheat * 2;
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - lastTouchTime < MIN_CLICK_INTERVAL) {
+                        return true;
+                    }
+                    lastTouchTime = currentTime;
+                    if (cannonOverheat < 220) {
+                        shootBlock();
+                        cannonOverheat = 20 + cannonOverheat * 2;
+                    }
                 }
             }
         }
@@ -353,11 +363,11 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
                     // Verificar si forma un rectángulo completo
                     if (group.isCompleteRectangle()) {
-                        Iterator<BlockGroup> groupIterator = fallingGroups.iterator();
                         List<BlockGroup> groupsToRemove = new ArrayList<>();
                         int points = group.getBlockCount() * 10;
                         score += points;
                         level = score / 500 + 1; // Subir nivel cada 500 puntos
+                        cannonOverheat = 0; // Eliminar el sobrecalentamiento
 
                         // Crear popup de puntuación
                         createScorePopup(group.getCenterX(), group.getCenterY(), points);
@@ -369,7 +379,6 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         group.startDisappearWithEffect();
                         // Marcar para eliminar
                         groupsToRemove.add(group);
-                        //groupIterator.remove();
                         for (BlockGroup blocks : groupsToRemove) {
                             fallingGroups.remove(blocks);
                             System.out.println("Grupo eliminado. Grupos restantes: " + fallingGroups.size());
@@ -603,7 +612,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 Shader.TileMode.CLAMP
         ));
 
-// Base redondeada
+// Alas del cañón
         RectF baseRect = new RectF(
                 cannonPixelX - (baseWidth) / 2f,
                 cannonY + cannonHeight / 2f - baseHeight,
@@ -620,9 +629,9 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
         canvas.drawRoundRect(baseRect2, blockSize / 2f, blockSize / 2f, tubePaint);
 
-// Núcleo energético en la base
-        Paint energyPaint = new Paint();
-        energyPaint.setShader(new LinearGradient(
+// Sobrecalentamiento del cañón
+        Paint overheatPaint = new Paint();
+        overheatPaint.setShader(new LinearGradient(
                 cannonPixelX,                               // X0
                 cannonY,                                    // Y0 (arriba del cañón)
                 cannonPixelX,                               // X1
@@ -638,7 +647,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 cannonPixelX + baseWidth / 2f,
                 cannonY + cannonHeight - tubeHeight,
                 baseWidth,
-                energyPaint
+                overheatPaint
         );
 
 // Líneas de energía alrededor del tubo
