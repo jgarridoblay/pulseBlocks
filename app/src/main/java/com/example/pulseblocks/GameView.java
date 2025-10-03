@@ -8,11 +8,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
-import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -220,7 +217,9 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
         newBlock.setVelocityY(-8); // Velocidad más lenta para mejor control
         newBlock.setShootTime(System.currentTimeMillis()); // Para animación de trail
-        playerBlocks.add(newBlock);
+        synchronized (playerBlocks) {
+            playerBlocks.add(newBlock);
+        }
 
         // Animación de disparo del cañón
         cannonShakeX = random.nextFloat() * 10 - 5; // Shake entre -5 y 5
@@ -234,10 +233,13 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         for (int i = 0; i < 8; i++) {
             float angle = (float) (Math.PI * 2 * i / 8.0);
             float speed = 3 + random.nextFloat() * 2;
-            particles.add(new ParticleEffect(x, y,
-                    (float) Math.cos(angle) * speed,
-                    (float) Math.sin(angle) * speed - 2,
-                    Color.CYAN, 1000));
+
+            synchronized (particles) {
+                particles.add(new ParticleEffect(x, y,
+                        (float) Math.cos(angle) * speed,
+                        (float) Math.sin(angle) * speed - 2,
+                        Color.CYAN, 1000));
+            }
         }
     }
 
@@ -308,96 +310,100 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         // Spawner grupos
         spawnBlockGroup();
 
+        updateOverheatBar();
+
         // Actualizar bloques del jugador
-        Iterator<Block> playerIterator = playerBlocks.iterator();
-        while (playerIterator.hasNext()) {
-            Block block = playerIterator.next();
-            block.update();
+        synchronized (playerBlocks) {
+            Iterator<Block> playerIterator = playerBlocks.iterator();
+            while (playerIterator.hasNext()) {
+                Block block = playerIterator.next();
+                block.update();
 
-            // Remover si sale de la pantalla
-            if (block.y < -blockSize) {
-                playerIterator.remove();
-                continue;
-            }
+                // Remover si sale de la pantalla
+                if (block.y < -blockSize) {
+                    playerIterator.remove();
+                    continue;
+                }
 
-            // Verificar colisión con grupos que caen
-            for (BlockGroup group : fallingGroups) {
-                if (group.checkCollision(block)) {
-                    // Detener el movimiento del bloque
-                    block.setVelocityY(0);
+                // Verificar colisión con grupos que caen
+                for (BlockGroup group : fallingGroups) {
+                    if (group.checkCollision(block)) {
+                        // Detener el movimiento del bloque
+                        block.setVelocityY(0);
 
-                    // Buscar el bloque del grupo más cercano
-                    Block closestBlock = group.getClosestBlock(block);
+                        // Buscar el bloque del grupo más cercano
+                        Block closestBlock = group.getClosestBlock(block);
 
-                    if (closestBlock != null) {
-                        // Determinar dirección de aproximación
-                        float dx = block.x - closestBlock.x;
-                        float dy = block.y - closestBlock.y;
+                        if (closestBlock != null) {
+                            // Determinar dirección de aproximación
+                            float dx = block.x - closestBlock.x;
+                            float dy = block.y - closestBlock.y;
 
-                        // Posicionar según la dirección predominante
-                        if (Math.abs(dy) > Math.abs(dx)) {
-                            // Aproximación vertical
-                            block.x = closestBlock.x; // Misma columna
-                            if (dy < 0) {
-                                // Viene desde arriba
-                                block.y = closestBlock.y - blockSize;
+                            // Posicionar según la dirección predominante
+                            if (Math.abs(dy) > Math.abs(dx)) {
+                                // Aproximación vertical
+                                block.x = closestBlock.x; // Misma columna
+                                if (dy < 0) {
+                                    // Viene desde arriba
+                                    block.y = closestBlock.y - blockSize;
+                                } else {
+                                    // Viene desde abajo
+                                    block.y = closestBlock.y + blockSize;
+                                }
                             } else {
-                                // Viene desde abajo
-                                block.y = closestBlock.y + blockSize;
+                                // Aproximación horizontal
+                                block.y = closestBlock.y; // Misma fila
+                                if (dx < 0) {
+                                    // Viene desde la izquierda
+                                    block.x = closestBlock.x - blockSize;
+                                } else {
+                                    // Viene desde la derecha
+                                    block.x = closestBlock.x + blockSize;
+                                }
                             }
                         } else {
-                            // Aproximación horizontal
-                            block.y = closestBlock.y; // Misma fila
-                            if (dx < 0) {
-                                // Viene desde la izquierda
-                                block.x = closestBlock.x - blockSize;
-                            } else {
-                                // Viene desde la derecha
-                                block.x = closestBlock.x + blockSize;
+                            // Si no hay bloque cercano, alinear a cuadrícula
+                            int gridX = pixelToGridX(block.x);
+                            int gridY = pixelToGridY(block.y);
+                            block.x = gridToPixelX(gridX);
+                            block.y = gridToPixelY(gridY);
+                        }
+
+                        // Crear efecto visual
+                        createCollisionParticles(block.x + blockSize / 2, block.y + blockSize / 2);
+
+                        // IMPORTANTE: Agregar el bloque al grupo
+                        group.addBlock(block);
+
+                        // Remover de la lista de bloques del jugador
+                        playerIterator.remove();
+
+                        // Verificar si forma un rectángulo completo
+                        if (group.isCompleteRectangle()) {
+                            List<BlockGroup> groupsToRemove = new ArrayList<>();
+                            int points = group.getBlockCount() * 10;
+                            score += points;
+                            level = score / 500 + 1; // Subir nivel cada 500 puntos
+                            cannonOverheat = 0; // Eliminar el sobrecalentamiento
+
+                            // Crear popup de puntuación
+                            createScorePopup(group.getCenterX(), group.getCenterY(), points);
+
+                            // Crear explosión de partículas
+                            createExplosionParticles(group.getCenterX(), group.getCenterY(), group.getColor());
+
+                            updateScore();
+                            group.startDisappearWithEffect();
+                            // Marcar para eliminar
+                            groupsToRemove.add(group);
+                            for (BlockGroup blocks : groupsToRemove) {
+                                fallingGroups.remove(blocks);
+                                System.out.println("Grupo eliminado. Grupos restantes: " + fallingGroups.size());
                             }
                         }
-                    } else {
-                        // Si no hay bloque cercano, alinear a cuadrícula
-                        int gridX = pixelToGridX(block.x);
-                        int gridY = pixelToGridY(block.y);
-                        block.x = gridToPixelX(gridX);
-                        block.y = gridToPixelY(gridY);
+                        // Salir del bucle de grupos (ya encontramos colisión)
+                        break;
                     }
-
-                    // Crear efecto visual
-                    createCollisionParticles(block.x + blockSize / 2, block.y + blockSize / 2);
-
-                    // IMPORTANTE: Agregar el bloque al grupo
-                    group.addBlock(block);
-
-                    // Remover de la lista de bloques del jugador
-                    playerIterator.remove();
-
-                    // Verificar si forma un rectángulo completo
-                    if (group.isCompleteRectangle()) {
-                        List<BlockGroup> groupsToRemove = new ArrayList<>();
-                        int points = group.getBlockCount() * 10;
-                        score += points;
-                        level = score / 500 + 1; // Subir nivel cada 500 puntos
-                        cannonOverheat = 0; // Eliminar el sobrecalentamiento
-
-                        // Crear popup de puntuación
-                        createScorePopup(group.getCenterX(), group.getCenterY(), points);
-
-                        // Crear explosión de partículas
-                        createExplosionParticles(group.getCenterX(), group.getCenterY(), group.getColor());
-
-                        updateScore();
-                        group.startDisappearWithEffect();
-                        // Marcar para eliminar
-                        groupsToRemove.add(group);
-                        for (BlockGroup blocks : groupsToRemove) {
-                            fallingGroups.remove(blocks);
-                            System.out.println("Grupo eliminado. Grupos restantes: " + fallingGroups.size());
-                        }
-                    }
-                    // Salir del bucle de grupos (ya encontramos colisión)
-                    break;
                 }
             }
         }
@@ -439,12 +445,14 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void updateParticles() {
-        Iterator<ParticleEffect> particleIterator = particles.iterator();
-        while (particleIterator.hasNext()) {
-            ParticleEffect particle = particleIterator.next();
-            particle.update();
-            if (particle.isDead()) {
-                particleIterator.remove();
+        synchronized (particles) {
+            Iterator<ParticleEffect> particleIterator = particles.iterator();
+            while (particleIterator.hasNext()) {
+                ParticleEffect particle = particleIterator.next();
+                particle.update();
+                if (particle.isDead()) {
+                    particleIterator.remove();
+                }
             }
         }
     }
@@ -474,10 +482,12 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         for (int i = 0; i < 5; i++) {
             float angle = random.nextFloat() * (float) Math.PI * 2;
             float speed = 2 + random.nextFloat() * 3;
-            particles.add(new ParticleEffect(x, y,
-                    (float) Math.cos(angle) * speed,
-                    (float) Math.sin(angle) * speed,
-                    Color.WHITE, 500));
+            synchronized (particles) {
+                particles.add(new ParticleEffect(x, y,
+                        (float) Math.cos(angle) * speed,
+                        (float) Math.sin(angle) * speed,
+                        Color.WHITE, 500));
+            }
         }
     }
 
@@ -485,10 +495,12 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         for (int i = 0; i < 15; i++) {
             float angle = (float) (Math.PI * 2 * i / 15.0);
             float speed = 5 + random.nextFloat() * 5;
-            particles.add(new ParticleEffect(x, y,
-                    (float) Math.cos(angle) * speed,
-                    (float) Math.sin(angle) * speed,
-                    color, 800));
+            synchronized (particles) {
+                particles.add(new ParticleEffect(x, y,
+                        (float) Math.cos(angle) * speed,
+                        (float) Math.sin(angle) * speed,
+                        color, 800));
+            }
         }
     }
 
@@ -502,6 +514,14 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 scoreText.setText("Score: " + score + " | Level: " + level);
             });
         }
+    }
+
+    private void updateOverheatBar() {
+        mainActivity.runOnUiThread(() -> {
+            // Overheat bar
+            mainActivity.animateOverheatBarTo(cannonOverheat);
+        });
+
     }
 
     public void draw(Canvas canvas) {
@@ -736,12 +756,14 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void drawPlayerBlocks(Canvas canvas) {
-        for (Block block : playerBlocks) {
-            // Dibujar trail del bloque
-            drawBlockTrail(canvas, block);
+        synchronized (playerBlocks) {
+            for (Block block : playerBlocks) {
+                // Dibujar trail del bloque
+                drawBlockTrail(canvas, block);
 
-            // Dibujar el bloque con efecto de brillo
-            block.drawWithGlow(canvas, paint);
+                // Dibujar el bloque con efecto de brillo
+                block.drawWithGlow(canvas, paint);
+            }
         }
     }
 
@@ -772,8 +794,10 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private void drawParticles(Canvas canvas) {
         paint.setStyle(Paint.Style.FILL);
 
-        for (ParticleEffect particle : particles) {
-            particle.draw(canvas, paint);
+        synchronized (particles) {
+            for (ParticleEffect particle : particles) {
+                particle.draw(canvas, paint);
+            }
         }
     }
 
@@ -868,6 +892,131 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 }
             }
         }
+    }
+}
+
+class BackgroundStar {
+    public float x, y;
+    public float size;
+    public float brightness;
+    public float speed;
+    public int color;
+    private float alpha; // para parpadeo
+    private boolean fading;
+
+    public BackgroundStar(float x, float y, float brightness, float speed, int color) {
+        this.x = x;
+        this.y = y;
+        this.brightness = brightness;
+        this.size = brightness * 2;
+        this.speed = 0.5f + brightness;
+        this.color = color;
+        this.alpha = 0.5f + new Random().nextFloat() * 0.5f;
+        this.fading = new Random().nextBoolean();
+    }
+
+    public void update() {
+        y += speed;
+        if (y > 1920) y = 0;
+
+        // Efecto de parpadeo
+        brightness += (float) ((Math.random() - 0.5) * 0.1);
+        brightness = Math.max(0.1f, Math.min(1.0f, brightness));
+        if (fading) {
+            alpha -= 0.01f;
+            if (alpha <= 0.3f) fading = false;
+        } else {
+            alpha += 0.01f;
+            if (alpha >= 1f) fading = true;
+        }
+    }
+}
+
+class ParticleEffect {
+    public float x, y;
+    public float velocityX, velocityY;
+    public int color;
+    public long lifeTime;
+    public long creationTime;
+    public float size;
+    public float alpha;
+
+    public ParticleEffect(float x, float y, float vx, float vy, int color, long lifeTime) {
+        this.x = x;
+        this.y = y;
+        this.velocityX = vx;
+        this.velocityY = vy;
+        this.color = color;
+        this.lifeTime = lifeTime;
+        this.creationTime = System.currentTimeMillis();
+        this.size = 3 + (float)Math.random() * 4;
+        this.alpha = 255;
+    }
+
+    public void update() {
+        x += velocityX;
+        y += velocityY;
+        velocityY += 0.1f; // Gravedad
+
+        // Calcular alpha basado en el tiempo de vida
+        long elapsed = System.currentTimeMillis() - creationTime;
+        float progress = (float) elapsed / lifeTime;
+        alpha = 255 * (1.0f - progress);
+        size *= 0.98f; // Reducir tamaño gradualmente
+    }
+
+    public void draw(Canvas canvas, Paint paint) {
+        if (alpha > 0) {
+            int currentAlpha = Math.max(0, (int) alpha);
+            paint.setColor(Color.argb(currentAlpha,
+                    Color.red(color), Color.green(color), Color.blue(color)));
+            canvas.drawCircle(x, y, size, paint);
+        }
+    }
+
+    public boolean isDead() {
+        return System.currentTimeMillis() - creationTime > lifeTime || alpha <= 0;
+    }
+}
+
+class ScorePopup {
+    public float x, y;
+    public String text;
+    public long lifeTime;
+    public long creationTime;
+    public float alpha;
+    public float offsetY;
+
+    public ScorePopup(float x, float y, String text, long lifeTime) {
+        this.x = x;
+        this.y = y;
+        this.text = text;
+        this.lifeTime = lifeTime;
+        this.creationTime = System.currentTimeMillis();
+        this.alpha = 255;
+        this.offsetY = 0;
+    }
+
+    public void update() {
+        offsetY -= 2; // Mover hacia arriba
+
+        // Calcular alpha basado en el tiempo de vida
+        long elapsed = System.currentTimeMillis() - creationTime;
+        float progress = (float) elapsed / lifeTime;
+        alpha = 255 * (1.0f - progress);
+    }
+
+    public void draw(Canvas canvas, Paint paint) {
+        if (alpha > 0) {
+            int currentAlpha = Math.max(0, (int) alpha);
+            paint.setColor(Color.argb(currentAlpha, 255, 255, 0));
+            paint.setTextSize(24);
+            canvas.drawText(text, x, y + offsetY, paint);
+        }
+    }
+
+    public boolean isDead() {
+        return System.currentTimeMillis() - creationTime > lifeTime || alpha <= 0;
     }
 }
 

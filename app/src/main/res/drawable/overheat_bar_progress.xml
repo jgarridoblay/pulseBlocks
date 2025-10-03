@@ -1,0 +1,26 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Fondo oscuro con borde neón -->
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <solid android:color="#111111"/>
+            <stroke android:width="3dp" android:color="#00E5FF"/>
+            <corners android:radius="12dp"/>
+        </shape>
+    </item>
+
+    <!-- Progreso rojo neón que se llena de izquierda a derecha -->
+    <item android:id="@android:id/progress">
+        <clip> <!-- 🔹 clip es esencial -->
+            <shape android:shape="rectangle">
+                <gradient
+                    android:startColor="#FF1A1A"
+                    android:centerColor="#FF3333"
+                    android:endColor="#FF5555"
+                    android:angle="0"/> <!-- 0 grados = izquierda → derecha -->
+                <corners android:radius="12dp"/>
+            </shape>
+        </clip>
+    </item>
+
+</layer-list>

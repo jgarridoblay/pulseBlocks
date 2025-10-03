@@ -1,37 +1,27 @@
 // MainActivity.java
 package com.example.pulseblocks;
 
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.DisplayMetrics;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 public class MainActivity extends Activity {
     private GameView gameView;
@@ -40,6 +30,7 @@ public class MainActivity extends Activity {
     private RecordsView recordsView;
     private GameOverView gameOverView;
     private RelativeLayout mainLayout;
+    private ProgressBar overheatBar;
 
     // Estados de la aplicación
     public static final int STATE_MENU = 0;
@@ -275,6 +266,33 @@ public class MainActivity extends Activity {
 
         mainLayout.addView(rightButton, rightParams);
 
+        // Crear la barra
+        overheatBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+
+// Asignar drawable futurista
+        Drawable overheat = ContextCompat.getDrawable(this, R.drawable.overheat_bar_progress);
+        if (overheat != null) {
+            overheatBar.setProgressDrawable(overheat);
+        }
+        overheatBar.setMax(255);
+        overheatBar.setProgress(0); // valor inicial
+        overheatBar.setIndeterminate(false);
+
+// Layout params para colocarla entre los botones
+        RelativeLayout.LayoutParams barParams = new RelativeLayout.LayoutParams(
+                blockSize * 4,  // ancho mayor que los botones
+                blockSize * 2   // altura más delgada
+        );
+
+// Centrada horizontal y abajo
+        barParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        barParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+
+// Margen inferior para no chocar con los botones
+        barParams.setMargins(0, 0, 0, blockSize / 3);
+
+// Añadir la barra al layout
+        mainLayout.addView(overheatBar, barParams);
 
         // Texto de puntuación
         TextView scoreText = new TextView(this);
@@ -307,6 +325,17 @@ public class MainActivity extends Activity {
         editor.putFloat("musicVolume", music);
         editor.putFloat("sfxVolume", sfx);
         editor.apply();
+    }
+
+    public void animateOverheatBarTo(int targetValue) {
+        ObjectAnimator animator = ObjectAnimator.ofInt(
+                overheatBar,
+                "progress",
+                overheatBar.getProgress(), // desde valor actual
+                targetValue                  // hasta el valor deseado
+        );
+        animator.setDuration(80); // duración en milisegundos
+        animator.start();
     }
 
     public float getMusicVolume() { return musicVolume; }
