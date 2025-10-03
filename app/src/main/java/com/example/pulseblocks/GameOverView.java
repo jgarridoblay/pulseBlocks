@@ -153,10 +153,11 @@ class GameOverView extends LinearLayout {
             title.startAnimation(titleAnimSet);
 
             // Shake después de la escala
-            title.postDelayed(shakeView(title),1000);
+            title.postDelayed(shakeView(title), 1000);
 
         }
     }
+
     // Método que aplica una animación de "shake"
     private Runnable shakeView(View view) {
         Animation shake = new TranslateAnimation(0, 15, 0, 0);

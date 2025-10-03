@@ -1,0 +1,8 @@
+# ninja log v5
+1	347	1759493025347729088	CMakeFiles/pulseblocks.dir/Shader.cpp.o	87a14e3e7303144c
+1	353	1759493025354619842	CMakeFiles/pulseblocks.dir/Utility.cpp.o	a5c7516e292bbc0f
+1	356	1759493025357269792	CMakeFiles/pulseblocks.dir/AndroidOut.cpp.o	f2ca400fd1a57ff5
+1	374	1759493025375353811	CMakeFiles/pulseblocks.dir/TextureAsset.cpp.o	87b747c0bedf0f83
+0	470	1759493025471245935	CMakeFiles/pulseblocks.dir/main.cpp.o	da2c79315bad04ca
+1	505	1759493025504220142	CMakeFiles/pulseblocks.dir/Renderer.cpp.o	1f435476296bb39a
+505	574	1759493025574348859	/Users/juangarrido/Documents/juegos/pulseBlocks/app/build/intermediates/cxx/Debug/1u1443t2/obj/x86/libpulseblocks.so	4293a41631766fb4

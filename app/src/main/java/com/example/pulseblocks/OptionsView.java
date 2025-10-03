@@ -46,14 +46,14 @@ class OptionsView extends LinearLayout {
 
         // Volumen de música
         musicLabel = new TextView(getContext());
-        musicLabel.setText("Volumen Música: " + (int)(mainActivity.getMusicVolume() * 100) + "%");
+        musicLabel.setText("Volumen Música: " + (int) (mainActivity.getMusicVolume() * 100) + "%");
         musicLabel.setTextSize(20);
         musicLabel.setTextColor(Color.WHITE);
         addView(musicLabel);
 
         musicSeekBar = new SeekBar(getContext());
         musicSeekBar.setMax(100);
-        musicSeekBar.setProgress((int)(mainActivity.getMusicVolume() * 100));
+        musicSeekBar.setProgress((int) (mainActivity.getMusicVolume() * 100));
         musicSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -64,8 +64,13 @@ class OptionsView extends LinearLayout {
                 }
             }
 
-            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
 
         LinearLayout.LayoutParams seekBarParams = new LinearLayout.LayoutParams(
@@ -76,14 +81,14 @@ class OptionsView extends LinearLayout {
 
         // Volumen de efectos
         sfxLabel = new TextView(getContext());
-        sfxLabel.setText("Volumen Efectos: " + (int)(mainActivity.getSfxVolume() * 100) + "%");
+        sfxLabel.setText("Volumen Efectos: " + (int) (mainActivity.getSfxVolume() * 100) + "%");
         sfxLabel.setTextSize(20);
         sfxLabel.setTextColor(Color.WHITE);
         addView(sfxLabel);
 
         sfxSeekBar = new SeekBar(getContext());
         sfxSeekBar.setMax(100);
-        sfxSeekBar.setProgress((int)(mainActivity.getSfxVolume() * 100));
+        sfxSeekBar.setProgress((int) (mainActivity.getSfxVolume() * 100));
         sfxSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -94,8 +99,13 @@ class OptionsView extends LinearLayout {
                 }
             }
 
-            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
 
         LinearLayout.LayoutParams sfxSeekBarParams = new LinearLayout.LayoutParams(

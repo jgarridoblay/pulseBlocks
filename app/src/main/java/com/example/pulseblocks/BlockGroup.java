@@ -43,7 +43,7 @@ class BlockGroup {
     public void setFallSpeed(float speed) {
         this.fallSpeed = speed;
         // Ajustar intervalo de movimiento basado en la velocidad
-        moveInterval = Math.max(200, (int)(800 / speed));
+        moveInterval = Math.max(200, (int) (800 / speed));
     }
 
     public void update() {
@@ -170,6 +170,7 @@ class BlockGroup {
 
     /**
      * Actualiza la animación de desaparición
+     *
      * @return true si la animación ha terminado
      */
     public boolean updateDisappearEffect() {
@@ -287,7 +288,7 @@ class BlockGroup {
         // Resplandor alrededor del grupo completo
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(4);
-        paint.setColor(Color.argb((int)(50 * glow), 255, 255, 0));
+        paint.setColor(Color.argb((int) (50 * glow), 255, 255, 0));
 
         canvas.drawRect(minX - 5, minY - 5, maxX + 5, maxY + 5, paint);
     }
@@ -306,8 +307,8 @@ class BlockGroup {
                 // Si están adyacentes, dibujar conexión
                 if (areAdjacent(block1, block2)) {
                     canvas.drawLine(
-                            block1.x + block1.size/2, block1.y + block1.size/2,
-                            block2.x + block2.size/2, block2.y + block2.size/2,
+                            block1.x + block1.size / 2, block1.y + block1.size / 2,
+                            block2.x + block2.size / 2, block2.y + block2.size / 2,
                             paint
                     );
                 }
@@ -436,8 +437,8 @@ class BlockGroup {
         boolean[][] matrix = new boolean[rows][cols];
 
         for (Block block : blocks) {
-            int row = ((int)block.y - minY) / blockSize;
-            int col = ((int)block.x - minX) / blockSize;
+            int row = ((int) block.y - minY) / blockSize;
+            int col = ((int) block.x - minX) / blockSize;
             if (row >= 0 && row < rows && col >= 0 && col < cols) {
                 matrix[row][col] = true;
             }
@@ -458,16 +459,16 @@ class BlockGroup {
     private void updateBounds() {
         if (blocks.isEmpty()) return;
 
-        minX = (int)blocks.get(0).x;
-        maxX = (int)(blocks.get(0).x + blocks.get(0).size);
-        minY = (int)blocks.get(0).y;
-        maxY = (int)(blocks.get(0).y + blocks.get(0).size);
+        minX = (int) blocks.get(0).x;
+        maxX = (int) (blocks.get(0).x + blocks.get(0).size);
+        minY = (int) blocks.get(0).y;
+        maxY = (int) (blocks.get(0).y + blocks.get(0).size);
 
         for (Block block : blocks) {
-            minX = Math.min(minX, (int)block.x);
-            maxX = Math.max(maxX, (int)(block.x + block.size));
-            minY = Math.min(minY, (int)block.y);
-            maxY = Math.max(maxY, (int)(block.y + block.size));
+            minX = Math.min(minX, (int) block.x);
+            maxX = Math.max(maxX, (int) (block.x + block.size));
+            minY = Math.min(minY, (int) block.y);
+            maxY = Math.max(maxY, (int) (block.y + block.size));
         }
     }
 }

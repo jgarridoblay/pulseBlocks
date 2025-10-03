@@ -1,0 +1,27 @@
+{
+  "buildFiles": [
+    "/Users/juangarrido/Documents/juegos/pulseBlocks/app/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/juangarrido/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/armeabi-v7a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/juangarrido/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/juangarrido/Documents/juegos/pulseBlocks/app/.cxx/Debug/1u1443t2/armeabi-v7a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "pulseblocks::@6890427a1f51a3e7e1df": {
+      "artifactName": "pulseblocks",
+      "abi": "armeabi-v7a",
+      "output": "/Users/juangarrido/Documents/juegos/pulseBlocks/app/build/intermediates/cxx/Debug/1u1443t2/obj/armeabi-v7a/libpulseblocks.so",
+      "runtimeFiles": []
+    }
+  }
+}

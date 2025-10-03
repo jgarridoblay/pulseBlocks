@@ -8,6 +8,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.view.MotionEvent;
@@ -142,7 +144,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         return true;
     }
 
-    public int getBlockSize () {
+    public int getBlockSize() {
         return blockSize;
     }
 
@@ -252,8 +254,8 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
             float size = random.nextFloat() * 2.5f + 0.5f; // tamaño variable
             float speed = random.nextFloat() * 0.3f; // velocidad de movimiento
             int color = Color.rgb(
-                    (int)(50 + random.nextFloat() * 205), // rojo
-                    (int)(150 + random.nextFloat() * 105), // verde
+                    (int) (50 + random.nextFloat() * 205), // rojo
+                    (int) (150 + random.nextFloat() * 105), // verde
                     255 // azul neón
             );
 
@@ -370,7 +372,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         }
 
                         // Crear efecto visual
-                        createCollisionParticles(block.x + blockSize / 2, block.y + blockSize / 2);
+                        createCollisionParticles(block.x + blockSize / 2f, block.y + blockSize / 2f);
 
                         // IMPORTANTE: Agregar el bloque al grupo
                         group.addBlock(block);
@@ -409,9 +411,7 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         // Actualizar grupos que caen
-        Iterator<BlockGroup> groupIterator = fallingGroups.iterator();
-        while (groupIterator.hasNext()) {
-            BlockGroup group = groupIterator.next();
+        for (BlockGroup group : fallingGroups) {
             group.update();
 
             // Verificar si llegó al suelo
@@ -612,65 +612,184 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         int tubeWidth = blockSize - 5;
         int tubeHeight = blockSize;
 
-// Tubo con gradiente brillante
-        Paint tubePaint = new Paint();
-        tubePaint.setShader(new LinearGradient(
-                cannonPixelX,
-                cannonY,
-                cannonPixelX + tubeWidth,
-                cannonY + tubeHeight,
-                Color.WHITE,
-                Color.CYAN,
-                Shader.TileMode.CLAMP
-        ));
-// Tubo redondeado
-        RectF tubeRect = new RectF(
-                cannonPixelX,
-                cannonY,
-                cannonPixelX + tubeWidth,
-                cannonY + tubeHeight + blockSize
-        );
-        canvas.drawRoundRect(tubeRect, 15, 15, tubePaint);
+        // Colores de la nave
+        int colorPrimario = Color.parseColor("#00D9FF");
+        int colorSecundario = Color.parseColor("#0080FF");
+        int colorOscuro = Color.parseColor("#003D5C");
+        int colorBrillante = Color.parseColor("#FFFFFF");
+        int colorMotor = Color.parseColor("#FF6B00");
 
-// Pintura con gradiente para la base
-        Paint basePaint = new Paint();
-        basePaint.setShader(new LinearGradient(
-                (float) cannonPixelX,
-                (float) cannonY + cannonHeight - baseHeight,
-                (float) (cannonPixelX + baseWidth),
-                (float) cannonY + cannonHeight,
-                Color.CYAN,
-                Color.BLUE,
+        // Cuerpo principal (fuselaje central)
+        Paint bodyPaint = new Paint();
+        bodyPaint.setAntiAlias(true);
+        bodyPaint.setShader(new LinearGradient(
+                cannonPixelX,
+                cannonY,
+                cannonPixelX + blockSize,
+                cannonY + cannonHeight,
+                new int[]{colorBrillante, colorPrimario, colorOscuro},
+                new float[]{0f, 0.4f, 1f},
                 Shader.TileMode.CLAMP
         ));
 
-// Alas del cañón
-        RectF baseRect = new RectF(
-                cannonPixelX - (baseWidth) / 2f,
-                cannonY + cannonHeight / 2f - baseHeight,
-                cannonPixelX + (baseWidth) / 2f+ blockSize,
-                cannonY + cannonHeight / 2f
+        RectF fuselaje = new RectF(
+                cannonPixelX + blockSize * 0.2f,
+                cannonY,
+                cannonPixelX + blockSize * 0.8f,
+                cannonY + cannonHeight
         );
-        canvas.drawRoundRect(baseRect, blockSize / 2f, blockSize / 2f, tubePaint);
+        canvas.drawRoundRect(fuselaje, 20, 20, bodyPaint);
 
-        RectF baseRect2 = new RectF(
-                cannonPixelX - (baseWidth) / 3f,
-                cannonY + cannonHeight * 3 / 4f - baseHeight * 2,
-                cannonPixelX + (baseWidth) / 3f + blockSize,
-                cannonY + cannonHeight * 3 / 4f
+        // Cabina (cockpit)
+        Paint cockpitPaint = new Paint();
+        cockpitPaint.setAntiAlias(true);
+        cockpitPaint.setShader(new RadialGradient(
+                cannonPixelX + blockSize * 0.5f,
+                cannonY + blockSize * 0.3f,
+                blockSize * 0.4f,
+                new int[]{Color.parseColor("#80FFFFFF"), Color.parseColor("#2000D9FF")},
+                new float[]{0f, 1f},
+                Shader.TileMode.CLAMP
+        ));
+
+        RectF cockpit = new RectF(
+                cannonPixelX + blockSize * 0.25f,
+                cannonY + blockSize * 0.1f,
+                cannonPixelX + blockSize * 0.75f,
+                cannonY + blockSize * 0.5f
         );
-        canvas.drawRoundRect(baseRect2, blockSize / 2f, blockSize / 2f, tubePaint);
+        canvas.drawRoundRect(cockpit, 30, 30, cockpitPaint);
+
+        // Alas principales (más dinámicas)
+        Path wingLeft = new Path();
+        wingLeft.moveTo(cannonPixelX + blockSize * 0.2f, cannonY + cannonHeight * 0.4f);
+        wingLeft.lineTo(cannonPixelX - blockSize * 0.8f, cannonY + cannonHeight * 0.5f);
+        wingLeft.lineTo(cannonPixelX - blockSize * 0.6f, cannonY + cannonHeight * 0.65f);
+        wingLeft.lineTo(cannonPixelX + blockSize * 0.2f, cannonY + cannonHeight * 0.6f);
+        wingLeft.close();
+
+        Paint wingPaint = new Paint();
+        wingPaint.setAntiAlias(true);
+        wingPaint.setShader(new LinearGradient(
+                cannonPixelX - blockSize * 0.8f,
+                cannonY + cannonHeight * 0.5f,
+                cannonPixelX + blockSize * 0.2f,
+                cannonY + cannonHeight * 0.6f,
+                new int[]{colorOscuro, colorSecundario, colorPrimario},
+                null,
+                Shader.TileMode.CLAMP
+        ));
+        canvas.drawPath(wingLeft, wingPaint);
+
+        Path wingRight = new Path();
+        wingRight.moveTo(cannonPixelX + blockSize * 0.8f, cannonY + cannonHeight * 0.4f);
+        wingRight.lineTo(cannonPixelX + blockSize * 1.8f, cannonY + cannonHeight * 0.5f);
+        wingRight.lineTo(cannonPixelX + blockSize * 1.6f, cannonY + cannonHeight * 0.65f);
+        wingRight.lineTo(cannonPixelX + blockSize * 0.8f, cannonY + cannonHeight * 0.6f);
+        wingRight.close();
+        canvas.drawPath(wingRight, wingPaint);
+
+        // Alas traseras (estabilizadores)
+        Path tailWingLeft = new Path();
+        tailWingLeft.moveTo(cannonPixelX + blockSize * 0.25f, cannonY + cannonHeight * 0.75f);
+        tailWingLeft.lineTo(cannonPixelX - blockSize * 0.3f, cannonY + cannonHeight * 0.8f);
+        tailWingLeft.lineTo(cannonPixelX - blockSize * 0.2f, cannonY + cannonHeight * 0.9f);
+        tailWingLeft.lineTo(cannonPixelX + blockSize * 0.25f, cannonY + cannonHeight * 0.85f);
+        tailWingLeft.close();
+        canvas.drawPath(tailWingLeft, wingPaint);
+
+        Path tailWingRight = new Path();
+        tailWingRight.moveTo(cannonPixelX + blockSize * 0.75f, cannonY + cannonHeight * 0.75f);
+        tailWingRight.lineTo(cannonPixelX + blockSize * 1.3f, cannonY + cannonHeight * 0.8f);
+        tailWingRight.lineTo(cannonPixelX + blockSize * 1.2f, cannonY + cannonHeight * 0.9f);
+        tailWingRight.lineTo(cannonPixelX + blockSize * 0.75f, cannonY + cannonHeight * 0.85f);
+        tailWingRight.close();
+        canvas.drawPath(tailWingRight, wingPaint);
+
+        // Motores/propulsores
+        Paint enginePaint = new Paint();
+        enginePaint.setAntiAlias(true);
+        enginePaint.setShader(new RadialGradient(
+                cannonPixelX + blockSize * 0.3f,
+                cannonY + cannonHeight - blockSize * 0.15f,
+                blockSize * 0.15f,
+                new int[]{colorMotor, colorOscuro},
+                new float[]{0.3f, 1f},
+                Shader.TileMode.CLAMP
+        ));
+
+        canvas.drawCircle(
+                cannonPixelX + blockSize * 0.3f,
+                cannonY + cannonHeight - blockSize * 0.15f,
+                blockSize * 0.15f,
+                enginePaint
+        );
+
+        enginePaint.setShader(new RadialGradient(
+                cannonPixelX + blockSize * 0.7f,
+                cannonY + cannonHeight - blockSize * 0.15f,
+                blockSize * 0.15f,
+                new int[]{colorMotor, colorOscuro},
+                new float[]{0.3f, 1f},
+                Shader.TileMode.CLAMP
+        ));
+
+        canvas.drawCircle(
+                cannonPixelX + blockSize * 0.7f,
+                cannonY + cannonHeight - blockSize * 0.15f,
+                blockSize * 0.15f,
+                enginePaint
+        );
+
+        // Detalles luminosos en el fuselaje
+        Paint glowPaint = new Paint();
+        glowPaint.setAntiAlias(true);
+        glowPaint.setColor(colorPrimario);
+        glowPaint.setStyle(Paint.Style.STROKE);
+        glowPaint.setStrokeWidth(3);
+
+        canvas.drawLine(
+                cannonPixelX + blockSize * 0.5f,
+                cannonY + blockSize * 0.6f,
+                cannonPixelX + blockSize * 0.5f,
+                cannonY + cannonHeight * 0.75f,
+                glowPaint
+        );
+
+        // Luces de navegación
+        Paint lightPaint = new Paint();
+        lightPaint.setAntiAlias(true);
+        lightPaint.setColor(Color.parseColor("#00FF88"));
+        canvas.drawCircle(cannonPixelX + blockSize * 0.15f, cannonY + cannonHeight * 0.5f, 5, lightPaint);
+
+        lightPaint.setColor(Color.parseColor("#FF0044"));
+        canvas.drawCircle(cannonPixelX + blockSize * 0.85f, cannonY + cannonHeight * 0.5f, 5, lightPaint);
+
+        // Paneles de armadura (detalles)
+        Paint panelPaint = new Paint();
+        panelPaint.setAntiAlias(true);
+        panelPaint.setColor(Color.parseColor("#40FFFFFF"));
+        panelPaint.setStyle(Paint.Style.STROKE);
+        panelPaint.setStrokeWidth(2);
+
+        RectF panel1 = new RectF(
+                cannonPixelX + blockSize * 0.3f,
+                cannonY + cannonHeight * 0.55f,
+                cannonPixelX + blockSize * 0.7f,
+                cannonY + cannonHeight * 0.65f
+        );
+        canvas.drawRoundRect(panel1, 5, 5, panelPaint);
 
 // Sobrecalentamiento del cañón
         Paint overheatPaint = new Paint();
         overheatPaint.setShader(new LinearGradient(
-                cannonPixelX,                               // X0
-                cannonY,                                    // Y0 (arriba del cañón)
-                cannonPixelX,                               // X1
-                cannonY + cannonHeight,                     // Y1 (abajo del cañón)
+                cannonPixelX,
+                cannonY,
+                cannonPixelX,
+                cannonY + cannonHeight,
                 Color.argb(cannonOverheat, 255, 0, 0),                                  // Color inicial (arriba)
-                Color.TRANSPARENT,                          // Color final (abajo)
-                Shader.TileMode.CLAMP                       // Extiende transparente hacia fuera
+                Color.TRANSPARENT,
+                Shader.TileMode.CLAMP
         ));
         if (cannonOverheat > 0) {
             cannonOverheat += -1;
@@ -683,57 +802,27 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback {
         );
 
 // Líneas de energía alrededor del tubo
-        Paint glowPaint = new Paint();
-        glowPaint.setColor(Color.CYAN);
-        glowPaint.setAlpha(120);
-        glowPaint.setStrokeWidth(4f);
+        Paint glowPaint2 = new Paint();
+        glowPaint2.setColor(Color.CYAN);
+        glowPaint2.setAlpha(120);
+        glowPaint2.setStrokeWidth(4f);
         for (int i = -2; i <= 2; i++) {
             canvas.drawLine(
                     cannonPixelX - 10,
                     cannonY + tubeHeight / 2f + i * 10,
                     cannonPixelX,
                     cannonY + tubeHeight / 2f + i * 10,
-                    glowPaint
+                    glowPaint2
             );
             canvas.drawLine(
                     cannonPixelX + tubeWidth,
                     cannonY + tubeHeight / 2f + i * 10,
                     cannonPixelX + tubeWidth + 10,
                     cannonY + tubeHeight / 2f + i * 10,
-                    glowPaint
+                    glowPaint2
             );
         }
 
-
-        // Efecto de brillo en el cañón
-        //drawCannonGlow(canvas, cannonPixelX, cannonY);
-
-        // Borde del cañón con pulso
-        //long time = System.currentTimeMillis();
-        //float glowIntensity = (float) (Math.sin(time * 0.01) * 0.5 + 0.5);
-        //int glowAlpha = (int) (100 + glowIntensity * 155);
-//
-        //paint.setColor(Color.argb(glowAlpha, 0, 255, 255));
-        //paint.setStyle(Paint.Style.STROKE);
-        //paint.setStrokeWidth(3);
-//
-        //// Borde de la base
-        //canvas.drawRect(
-        //        cannonPixelX,
-        //        cannonY + cannonHeight - baseHeight,
-        //        cannonPixelX + baseWidth,
-        //        cannonY + cannonHeight,
-        //        paint
-        //);
-//
-        //// Borde del tubo
-        //canvas.drawRect(
-        //        tubeX,
-        //        cannonY,
-        //        tubeX + tubeWidth,
-        //        cannonY + tubeHeight,
-        //        paint
-        //);
     }
 
     private void drawCannonGlow(Canvas canvas, int cannonX, int cannonY) {
@@ -949,7 +1038,7 @@ class ParticleEffect {
         this.color = color;
         this.lifeTime = lifeTime;
         this.creationTime = System.currentTimeMillis();
-        this.size = 3 + (float)Math.random() * 4;
+        this.size = 3 + (float) Math.random() * 4;
         this.alpha = 255;
     }
 
