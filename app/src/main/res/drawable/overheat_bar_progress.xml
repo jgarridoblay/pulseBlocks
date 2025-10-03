@@ -14,10 +14,10 @@
         <clip> <!-- 🔹 clip es esencial -->
             <shape android:shape="rectangle">
                 <gradient
-                    android:startColor="#FF1A1A"
-                    android:centerColor="#FF3333"
-                    android:endColor="#FF5555"
-                    android:angle="0"/> <!-- 0 grados = izquierda → derecha -->
+                    android:startColor="#6CB4EE"
+                    android:centerColor="#FF1A1A"
+                    android:endColor="#8B0000"
+                    android:angle="30"/> <!-- 0 grados = izquierda → derecha -->
                 <corners android:radius="12dp"/>
             </shape>
         </clip>
